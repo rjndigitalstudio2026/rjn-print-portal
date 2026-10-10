@@ -1,92 +1,607 @@
-const express=require('express');
-const session=require('express-session');
-const bcrypt=require('bcryptjs');
-const multer=require('multer');
-const path=require('path');
-const fs=require('fs');
-require('dotenv').config();
+const $ = (s, r = document) => r.querySelector(s);
+const app = $('#app'), nav = $('#nav');
 
-const app=express();
-const PORT=Number(process.env.PORT||3000);
-const ROOT=__dirname;
-const DATA=path.join(ROOT,'data');
-const UP=path.join(ROOT,'uploads');
-const PAYMENT=path.join(UP,'payment');
-const RESULTS=path.join(UP,'results');
-for(const d of [DATA,UP,PAYMENT,RESULTS])fs.mkdirSync(d,{recursive:true});
-const DB=path.join(DATA,'db.json');
-const now=()=>new Date().toISOString();
-const monthKey=()=>{const d=new Date();return d.toISOString().slice(0,7)};
-function load(){if(!fs.existsSync(DB))return {users:[],services:[],walletRequests:[],walletLedger:[],requests:[],messages:[],settings:{upiId:process.env.UPI_ID||'rjnpancenter@naviaxis'}};return JSON.parse(fs.readFileSync(DB,'utf8'))}
-let db=load();
-function save(){const tmp=DB+'.tmp';fs.writeFileSync(tmp,JSON.stringify(db,null,2));fs.renameSync(tmp,DB)}
-const id=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
-const safeUser=u=>({id:u.id,name:u.name,email:u.email,phone:u.phone,role:u.role,wallet:u.wallet||0,createdAt:u.createdAt});
-function seed(){
- if(!db.settings)db.settings={upiId:process.env.UPI_ID||'rjnpancenter@naviaxis'};
- if(!db.users.some(u=>u.role==='admin'))db.users.push({id:id(),name:'RJN Admin',email:(process.env.ADMIN_EMAIL||'admin@rjnprintportal.local').toLowerCase(),phone:'',passwordHash:bcrypt.hashSync(process.env.ADMIN_PASSWORD||'ChangeMe123!',12),role:'admin',wallet:0,createdAt:now()});
- if(db.services.length)return;
- const add=(name,price,description,fields,documents)=>db.services.push({id:id(),name,price,description,icon:'📄',enabled:true,fields,documents,instructions:'Submit only information and documents you are authorized to provide.',createdAt:now()});
- add('Aadhaar to PAN Find',25,'Aadhaar based manual request',[['aadhaar','Aadhaar Number','text',true]],[]);
- add('PAN Details Find',15,'PAN details manual request',[['pan','PAN Number','text',true]],[]);
- add('PAN Verification',15,'PAN verification request',[['pan','PAN Number','text',true]],[]);
- add('Voter Mobile Link',25,'Manual voter mobile-link request',[['epic','EPIC / Voter ID','text',true],['mobile','Mobile Number','tel',true]],[]);
- add('Voter PDF With Download',6,'Manual voter PDF request',[['epic','EPIC / Voter ID','text',true]],[]);
- add('PAN to Aadhaar Find',25,'PAN to Aadhaar manual request',[['pan','PAN Number','text',true]],[]);
- add('GST Details',10,'GST details request',[['gstin','GSTIN','text',true]],[]);
- add('Assam Ration to Aadhaar',70,'Manual ration/Aadhaar request',[['ration','Assam Ration Card Number','text',true]],[]);
- add('Ration No. to PDF',20,'Ration PDF request',[['ration','Ration Card Number','text',true],['design','Card Design Type','text',true]],[]);
- add('E-Shram PDF Download',10,'E-Shram PDF request',[['eshram','E-Shram Number','text',true]],[]);
- add('NPCI Status',10,'NPCI status request',[['aadhaar','Aadhaar Number','text',true]],[]);
- add('Mobile No. to PAN Find',10,'Mobile to PAN request',[['mobile','Mobile Number','tel',true]],[]);
- add('PAN Manual',15,'Manual PAN service',[['pan','PAN Number','text',true],['name','Name','text',true],['father','Father Name','text',false],['dob','Date of Birth','date',true],['gender','Gender','select',true]],['Photo','Signature']);
- add('Aadhaar Manual',20,'Manual Aadhaar service',[['aadhaar','Aadhaar Number','text',true],['name','Name','text',true],['father','Father Name','text',true],['house','House No.','text',false],['locality','Gali / Locality','text',true],['post','Post Office','text',true],['state','State','text',true],['city','City','text',true],['pin','PIN Code','text',true],['dob','Date of Birth','date',true],['gender','Gender','select',true],['address','Address','textarea',true]],['Photo']);
- add('Voter Manual Instant',15,'Manual voter service',[['epic','EPIC Number','text',false],['full_name_en','Full Name (English)','text',true],['full_name_local','Full Name (Local)','text',false],['relation','Relation Type','select',true],['relative_en','Father/Mother Name','text',false],['dob','Date of Birth','date',true],['gender','Gender','select',true],['address_en','Address','textarea',true]],['Voter Photo']);
- add('Voter Manual New',15,'New voter manual application',[['full_name','Full Name','text',true],['dob','Date of Birth','date',true],['gender','Gender','select',true],['address','Address','textarea',true],['mobile','Mobile Number','tel',false]],['Voter Photo','Identity/Address Document']);
- add('RTPS Services',10,'Manual RTPS request',[['service_type','RTPS Service Type','text',true],['name','Applicant Name','text',true],['mobile','Mobile Number','tel',true],['details','Application Details','textarea',true]],['Supporting Document']);
- save();
+let me = null, settings = {}, services = [], chosen = null;
+
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({
+  '&': '&amp;', '<': '&lt;', '>': '&gt;',
+  '"': '&quot;', "'": '&#39;'
+}[c]));
+
+const cash = n => '₹' + Number(n || 0).toLocaleString('en-IN');
+
+async function api(url, opts = {}) {
+  const headers = { ...(opts.headers || {}) };
+  let body = opts.body;
+
+  if (body && !(body instanceof FormData) && typeof body !== 'string') {
+    headers['Content-Type'] = 'application/json';
+    body = JSON.stringify(body);
+  }
+
+  const r = await fetch(url, {
+    ...opts,
+    headers,
+    body,
+    credentials: 'same-origin'
+  });
+
+  const d = (r.headers.get('content-type') || '').includes('json')
+    ? await r.json()
+    : await r.text();
+
+  if (!r.ok) throw Error(d?.error || d?.message || 'Request failed');
+  return d;
 }
-seed();
-app.use(express.json({limit:'3mb'}));
-app.use(express.urlencoded({extended:true}));
-app.use(session({secret:process.env.SESSION_SECRET||'rjn-local-change-me',resave:false,saveUninitialized:false,cookie:{httpOnly:true,sameSite:'lax',maxAge:8*60*60*1000}}));
-app.use(express.static(path.join(ROOT,'public')));
-const disk=multer.diskStorage({destination:(req,file,cb)=>cb(null,file.fieldname==='result'?RESULTS:PAYMENT),filename:(req,file,cb)=>cb(null,id()+path.extname(file.originalname||''))});
-const upload=multer({storage:disk,limits:{fileSize:10*1024*1024}});
-const auth=(req,res,next)=>{const u=db.users.find(x=>x.id===req.session.userId);if(!u)return res.status(401).json({error:'Login required'});req.user=u;next()};
-const admin=(req,res,next)=>{if(req.user?.role!=='admin')return res.status(403).json({error:'Admin only'});next()};
-const customer=(req,res,next)=>{if(req.user?.role!=='customer')return res.status(403).json({error:'Customer only'});next()};
-const publicService=s=>({...s,price:Number(s.price),fields:s.fields||[],documents:s.documents||[]});
-app.get('/api/me',(req,res)=>{const u=db.users.find(x=>x.id===req.session.userId);res.json({user:u?safeUser(u):null,settings:{upiId:db.settings.upiId}})});
-app.post('/api/register',(req,res)=>{try{const {name,phone,email,password}=req.body;if(!name||!phone||!email||!password)return res.status(400).json({error:'Name, mobile, email and password are required'});if(String(password).length<8)return res.status(400).json({error:'Password must be at least 8 characters'});const e=String(email).trim().toLowerCase(),p=String(phone).trim();if(db.users.some(u=>u.email===e||u.phone===p))return res.status(400).json({error:'Email or mobile already registered'});const u={id:id(),name:String(name).trim(),phone:p,email:e,passwordHash:bcrypt.hashSync(password,12),role:'customer',wallet:0,createdAt:now()};db.users.push(u);save();req.session.userId=u.id;res.json({user:safeUser(u)})}catch(e){res.status(400).json({error:'Registration failed'})}});
-app.post('/api/login',(req,res)=>{const key=String(req.body.identifier||'').trim().toLowerCase(),u=db.users.find(x=>x.email===key||x.phone===String(req.body.identifier||'').trim());if(!u||!bcrypt.compareSync(String(req.body.password||''),u.passwordHash))return res.status(401).json({error:'Invalid email/mobile or password'});req.session.userId=u.id;res.json({user:safeUser(u)})});
-app.post('/api/logout',(req,res)=>req.session.destroy(()=>res.json({ok:true})));
-app.get('/api/services',(req,res)=>res.json(db.services.filter(s=>s.enabled).map(publicService)));
-app.get('/api/customer/stats',auth,customer,(req,res)=>{const mine=db.requests.filter(r=>r.userId===req.user.id);res.json({wallet:req.user.wallet||0,total:mine.length,pending:mine.filter(r=>['Pending','Processing'].includes(r.status)).length,completed:mine.filter(r=>r.status==='Completed').length,upiId:db.settings.upiId})});
-app.post('/api/wallet/request',auth,customer,upload.single('proof'),(req,res)=>{const amount=Number(req.body.amount);if(!Number.isFinite(amount)||amount<=0)return res.status(400).json({error:'Enter a valid amount'});const utr=String(req.body.utr||'').trim();if(!utr)return res.status(400).json({error:'UTR / transaction ID is required'});if(db.walletRequests.some(w=>w.utr===utr&&['Pending','Approved'].includes(w.status)))return res.status(400).json({error:'This UTR is already submitted'});db.walletRequests.push({id:id(),userId:req.user.id,amount,utr,proofFile:req.file?.filename||null,status:'Pending',createdAt:now(),month:monthKey()});save();res.json({ok:true})});
-app.get('/api/customer/wallet',(req,res)=>{if(!req.user)return res.status(401).json({error:'Login required'});res.json(db.walletRequests.filter(w=>w.userId===req.user.id).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).slice(0,30))});
-app.post('/api/service/:sid/request',auth,customer,upload.array('files',10),(req,res)=>{const s=db.services.find(x=>x.id===req.params.sid&&x.enabled);if(!s)return res.status(404).json({error:'Service not found'});const data=JSON.parse(req.body.data||'{}');for(const f of s.fields||[])if(f[3]&&!String(data[f[0]]||'').trim())return res.status(400).json({error:'Required field: '+f[1]});if((req.user.wallet||0)<Number(s.price))return res.status(400).json({error:'Insufficient wallet balance'});const files=(req.files||[]).map(f=>({file:f.filename,name:f.originalname}));req.user.wallet=Number(req.user.wallet)-Number(s.price);const r={id:id(),userId:req.user.id,serviceId:s.id,data,fee:Number(s.price),status:'Pending',inputFiles:files,resultFile:null,resultName:null,createdAt:now(),completedAt:null,expiresAt:null,refunded:false};db.requests.push(r);db.walletLedger.push({id:id(),userId:req.user.id,type:'DEBIT',amount:Number(s.price),requestId:r.id,createdAt:now(),note:'Service charge: '+s.name});save();res.json({ok:true,wallet:req.user.wallet,requestId:r.id})});
-app.get('/api/customer/requests',auth,customer,(req,res)=>res.json(db.requests.filter(r=>r.userId===req.user.id).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(r=>{const s=db.services.find(x=>x.id===r.serviceId);return {...r,serviceName:s?.name||'Service',resultAvailable:!!r.resultFile&&(!r.expiresAt||new Date(r.expiresAt)>new Date())}})));
-app.get('/api/result/:rid',auth,customer,(req,res)=>{const r=db.requests.find(x=>x.id===req.params.rid&&x.userId===req.user.id);if(!r||!r.resultFile)return res.status(404).send('Result not available');if(r.expiresAt&&new Date(r.expiresAt)<new Date())return res.status(410).send('File expired');const p=path.join(RESULTS,r.resultFile);if(!fs.existsSync(p))return res.status(404).send('File expired');res.download(p,r.resultName||'result')});
-app.get('/api/chat',auth,(req,res)=>res.json(db.messages.filter(m=>m.userId===req.user.id).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)).slice(-100)));
-app.post('/api/chat',auth,upload.single('attachment'),(req,res)=>{const text=String(req.body.message||'').trim();if(!text&&!req.file)return res.status(400).json({error:'Message is empty'});db.messages.push({id:id(),userId:req.user.id,from:req.user.role,text,attachment:req.file?{file:req.file.filename,name:req.file.originalname}:null,createdAt:now(),read:false});save();res.json({ok:true})});
-// Admin
-app.get('/api/admin/dashboard',auth,admin,(req,res)=>{const customers=db.users.filter(u=>u.role==='customer');const today=new Date().toISOString().slice(0,10);res.json({customers:customers.length,active:customers.length,todayRegistrations:customers.filter(u=>u.createdAt.startsWith(today)).length,monthRegistrations:customers.filter(u=>u.createdAt.startsWith(monthKey())).length,pendingWallet:db.walletRequests.filter(w=>w.status==='Pending').length,pendingRequests:db.requests.filter(r=>['Pending','Processing'].includes(r.status)).length,services:db.services.length})});
-app.get('/api/admin/customers',auth,admin,(req,res)=>res.json(db.users.filter(u=>u.role==='customer').sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(safeUser)));
-app.get('/api/admin/services',auth,admin,(req,res)=>res.json(db.services.map(publicService)));
-app.post('/api/admin/services',auth,admin,(req,res)=>{const b=req.body;if(!b.name)return res.status(400).json({error:'Service name required'});const s={id:id(),name:String(b.name),price:Number(b.price)||0,description:String(b.description||''),icon:String(b.icon||'📄'),enabled:b.enabled!==false,fields:b.fields||[],documents:b.documents||[],instructions:String(b.instructions||''),createdAt:now()};db.services.push(s);save();res.json(s)});
-app.put('/api/admin/services/:id',auth,admin,(req,res)=>{const s=db.services.find(x=>x.id===req.params.id);if(!s)return res.status(404).json({error:'Service not found'});Object.assign(s,{name:String(req.body.name||s.name),price:Number(req.body.price)||0,description:String(req.body.description||''),icon:String(req.body.icon||'📄'),enabled:req.body.enabled!==false,fields:req.body.fields||[],documents:req.body.documents||[],instructions:String(req.body.instructions||'')});save();res.json(s)});
-app.delete('/api/admin/services/:id',auth,admin,(req,res)=>{const s=db.services.find(x=>x.id===req.params.id);if(!s)return res.status(404).json({error:'Not found'});s.enabled=false;save();res.json({ok:true})});
-app.get('/api/admin/wallet',auth,admin,(req,res)=>res.json(db.walletRequests.filter(w=>w.month===monthKey()).sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(w=>({...w,customer:db.users.find(u=>u.id===w.userId)?.name||'Unknown'}))));
-app.post('/api/admin/wallet/:id/approve',auth,admin,(req,res)=>{const w=db.walletRequests.find(x=>x.id===req.params.id&&x.status==='Pending');if(!w)return res.status(404).json({error:'Request not found'});const u=db.users.find(x=>x.id===w.userId);w.status='Approved';u.wallet=Number(u.wallet||0)+Number(w.amount);db.walletLedger.push({id:id(),userId:u.id,type:'CREDIT',amount:Number(w.amount),walletRequestId:w.id,createdAt:now(),note:'Wallet add-money approved'});save();res.json({ok:true})});
-app.post('/api/admin/wallet/:id/reject',auth,admin,(req,res)=>{const w=db.walletRequests.find(x=>x.id===req.params.id&&x.status==='Pending');if(!w)return res.status(404).json({error:'Request not found'});w.status='Rejected';save();res.json({ok:true})});
-app.delete('/api/admin/wallet/:id/proof',auth,admin,(req,res)=>{const w=db.walletRequests.find(x=>x.id===req.params.id);if(!w)return res.status(404).json({error:'Not found'});if(w.proofFile){const p=path.join(PAYMENT,w.proofFile);if(fs.existsSync(p))fs.unlinkSync(p);w.proofFile=null;save()}res.json({ok:true})});
-app.get('/api/admin/requests',auth,admin,(req,res)=>res.json(db.requests.sort((a,b)=>b.createdAt.localeCompare(a.createdAt)).map(r=>({...r,customer:db.users.find(u=>u.id===r.userId)?.name||'Unknown',serviceName:db.services.find(s=>s.id===r.serviceId)?.name||'Service'}))));
-app.post('/api/admin/request/:id/process',auth,admin,upload.single('result'),(req,res)=>{const r=db.requests.find(x=>x.id===req.params.id);if(!r)return res.status(404).json({error:'Request not found'});const status=String(req.body.status||'Processing');if(!['Processing','Completed','Rejected'].includes(status))return res.status(400).json({error:'Invalid status'});if(status==='Rejected'&&!r.refunded){const u=db.users.find(x=>x.id===r.userId);u.wallet=Number(u.wallet||0)+Number(r.fee);r.refunded=true;db.walletLedger.push({id:id(),userId:u.id,type:'REFUND',amount:Number(r.fee),requestId:r.id,createdAt:now(),note:'Automatic refund for rejected service'});}if(status==='Completed'){if(req.file){r.resultFile=req.file.filename;r.resultName=req.file.originalname}else if(!r.resultFile)return res.status(400).json({error:'Upload result file to complete this request'});r.completedAt=now();r.expiresAt=new Date(Date.now()+30*24*60*60*1000).toISOString()}r.status=status;save();res.json({ok:true})});
-app.get('/api/admin/chat/users',auth,admin,(req,res)=>{const ids=[...new Set(db.messages.map(m=>m.userId))];res.json(ids.map(uid=>{const u=db.users.find(x=>x.id===uid);return u?{...safeUser(u),unread:db.messages.filter(m=>m.userId===uid&&m.from==='customer'&&!m.read).length}:null}).filter(Boolean))});
-app.get('/api/admin/chat/:uid',auth,admin,(req,res)=>res.json(db.messages.filter(m=>m.userId===req.params.uid).sort((a,b)=>a.createdAt.localeCompare(b.createdAt)).slice(-100)));
-app.post('/api/admin/chat/:uid',auth,admin,upload.single('attachment'),(req,res)=>{const text=String(req.body.message||'').trim();if(!text&&!req.file)return res.status(400).json({error:'Message empty'});db.messages.push({id:id(),userId:req.params.uid,from:'admin',text,attachment:req.file?{file:req.file.filename,name:req.file.originalname}:null,createdAt:now(),read:true});db.messages.filter(m=>m.userId===req.params.uid&&m.from==='customer').forEach(m=>m.read=true);save();res.json({ok:true})});
-app.get('/api/attachment/:mid',auth,(req,res)=>{const m=db.messages.find(x=>x.id===req.params.mid);if(!m||!m.attachment)return res.status(404).end();if(req.user.role!=='admin'&&m.userId!==req.user.id)return res.status(403).end();const p=path.join(PAYMENT,m.attachment.file);if(!fs.existsSync(p))return res.status(404).end();res.download(p,m.attachment.name)});
-app.post('/api/admin/settings',auth,admin,(req,res)=>{db.settings.upiId=String(req.body.upiId||db.settings.upiId);save();res.json(db.settings)});
-setInterval(()=>{let changed=false;for(const r of db.requests){if(r.resultFile&&r.expiresAt&&new Date(r.expiresAt)<new Date()){const p=path.join(RESULTS,r.resultFile);if(fs.existsSync(p))fs.unlinkSync(p);r.resultFile=null;r.resultName=null;changed=true}}if(changed)save()},60*60*1000);
-app.listen(PORT,()=>console.log(`RJN PRINT PORTAL running at http://localhost:${PORT}`));
+
+function msg(t, bad = false) {
+  let n = $('#notice');
+
+  if (!n) {
+    n = document.createElement('p');
+    n.id = 'notice';
+    n.className = 'notice';
+    app.prepend(n);
+  }
+
+  n.textContent = t;
+  n.style.background = bad ? '#552631' : '#12243c';
+}
+
+const btn = (t, a) =>
+  `<button type="button" data-a="${esc(a)}">${esc(t)}</button>`;
+
+function shell() {
+  nav.innerHTML = me
+    ? `${esc(me.name || me.email)}
+       ${btn('Dashboard', 'home')}
+       ${btn('Add Money', 'wallet')}
+       ${btn('My Requests', 'requests')}
+       ${btn('Support Chat', 'chat')}
+       ${me.role === 'admin' ? btn('Admin Panel', 'admin:dashboard') : ''}
+       ${btn('Logout', 'logout')}`
+    : btn('Login / Register', 'auth');
+}
+
+function auth(mode = 'login') {
+  app.innerHTML = `
+    <section class="hero">
+      <h1>RJN PRINT PORTAL</h1>
+      <p>RJN DIGITAL STUDIO · All daily work at one portal</p>
+    </section>
+    <section class="card">
+      <div class="nav">
+        ${btn('Login', 'tablogin')}
+        ${btn('Create Account', 'tabregister')}
+      </div>
+      <div id="authform"></div>
+    </section>`;
+
+  const f = $('#authform');
+
+  f.innerHTML = mode === 'register' ? `
+    <h2>Create Account</h2>
+    <form id="register">
+      <label>Full Name
+        <input name="name" required maxlength="100">
+      </label>
+      <label>Mobile Number
+        <input name="phone" type="tel" required>
+      </label>
+      <label>Email
+        <input name="email" type="email" required>
+      </label>
+      <label>Password
+        <input name="password" type="password" minlength="8" required>
+      </label>
+      <button>Create Account</button>
+    </form>` : `
+    <h2>Sign In</h2>
+    <form id="login">
+      <label>Email or Mobile Number
+        <input name="identifier" required>
+      </label>
+      <label>Password
+        <input name="password" type="password" required>
+      </label>
+      <button>Login</button>
+    </form>`;
+}
+
+async function start() {
+  try {
+    const d = await api('/api/me');
+    me = d.user;
+    settings = d.settings || {};
+    shell();
+    await home();
+  } catch {
+    me = null;
+    shell();
+    auth();
+  }
+}
+
+async function home() {
+  if (!me) return auth();
+
+  shell();
+
+  if (me.role === 'admin') return admin('dashboard');
+
+  try {
+    const result = await api('/api/services');
+    services = Array.isArray(result) ? result : result.services || [];
+
+    let st = {
+      wallet: me.wallet || 0,
+      total: 0,
+      pending: 0,
+      completed: 0
+    };
+
+    try {
+      st = { ...st, ...await api('/api/customer/stats') };
+    } catch {}
+
+    app.innerHTML = `
+      <section class="hero">
+        <h1>Hello, ${esc(me.name || 'Customer')}!</h1>
+        <p>Welcome to RJN PRINT PORTAL</p>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <p>WALLET BALANCE</p>
+          <h2>${cash(st.wallet)}</h2>
+          ${btn('Add Money', 'wallet')}
+        </section>
+        <section class="card">
+          <p>TOTAL REQUESTS</p>
+          <h2>${st.total}</h2>
+        </section>
+        <section class="card">
+          <p>PENDING</p>
+          <h2>${st.pending}</h2>
+        </section>
+        <section class="card">
+          <p>COMPLETED</p>
+          <h2>${st.completed}</h2>
+        </section>
+      </div>
+
+      <h2>Available Services</h2>
+      <div class="grid">
+        ${services.map(s => `
+          <section class="card service">
+            <h3>${esc(s.icon || '📄')} ${esc(s.name)}</h3>
+            <p>${esc(s.description || 'Service request')}</p>
+            <strong>${cash(s.price)}</strong>
+            <p>${btn('Apply Now', 'service:' + s.id)}</p>
+          </section>
+        `).join('')}
+      </div>`;
+  } catch (e) {
+    app.innerHTML = `
+      <section class="card">
+        <h2>Unable to load services</h2>
+        <p>${esc(e.message)}</p>
+        ${btn('Retry', 'home')}
+      </section>`;
+  }
+}
+
+function serviceFields(s) {
+  const name = String(s.name || '').toLowerCase();
+
+  if (name.includes('pan id')) return [
+    ['name', 'Full Name', 'text', true],
+    ['shopName', 'Shop Name', 'text', true],
+    ['shopAddress', 'Shop Address', 'text', true],
+    ['pinCode', 'PIN Code', 'text', true],
+    ['state', 'State', 'text', true],
+    ['mobile', 'Mobile Number', 'tel', true],
+    ['email', 'Email ID', 'email', true],
+    ['aadhaarNumber', 'Aadhaar Number', 'text', true],
+    ['panNumber', 'PAN Number', 'text', false]
+  ];
+
+  if (name.includes('mobile recharge id')) return [
+    ['name', 'Full Name', 'text', true],
+    ['address', 'Address', 'text', true],
+    ['mobile', 'Mobile Number', 'tel', true],
+    ['email', 'Email ID', 'email', true]
+  ];
+
+  return (s.fields || []).map(f => Array.isArray(f)
+    ? [f[0], f[1], f[2] || 'text', f[3]]
+    : [
+        f.name || f.key || f.label,
+        f.label || f.name || f.key,
+        f.type || 'text',
+        f.required
+      ]);
+}
+
+function serviceForm(s) {
+  if (!s) return msg('Service not found.', true);
+
+  chosen = s;
+
+  app.innerHTML = `
+    <section class="card">
+      ${btn('← Back', 'home')}
+      <h2>${esc(s.name)}</h2>
+      <p>${esc(s.description || '')}</p>
+      <p>Charge: <strong>${cash(s.price)}</strong></p>
+
+      <form id="serviceform">
+        <div class="grid">
+          ${serviceFields(s).map(([key, label, type, required]) => {
+            if (type === 'select') {
+              return `
+                <label>${esc(label)}
+                  <select name="${esc(key)}" ${required === false ? '' : 'required'}>
+                    <option value="">Select ${esc(label)}</option>
+                    ${['Male', 'Female', 'Other', 'Father', 'Mother', 'Guardian'].map(v =>
+                      `<option value="${esc(v)}">${esc(v)}</option>`
+                    ).join('')}
+                  </select>
+                </label>`;
+            }
+
+            if (type === 'textarea') {
+              return `
+                <label>${esc(label)}
+                  <textarea name="${esc(key)}"
+                    ${required === false ? '' : 'required'}></textarea>
+                </label>`;
+            }
+
+            const t = [
+              'tel', 'email', 'number', 'date'
+            ].includes(type) ? type : 'text';
+
+            return `
+              <label>${esc(label)}
+                <input name="${esc(key)}" type="${t}"
+                  ${required === false ? '' : 'required'}>
+              </label>`;
+          }).join('')}
+        </div>
+
+        <label>Upload Supporting Documents
+          <input name="files" type="file" multiple
+            accept=".jpg,.jpeg,.png,.pdf">
+        </label>
+
+        <label>Additional Instructions
+          <textarea name="notes" maxlength="1000"></textarea>
+        </label>
+
+        <p>Submit only accurate information and documents you are authorized to provide.</p>
+        <button type="submit">Submit Request</button>
+      </form>
+    </section>`;
+}
+
+async function wallet() {
+  app.innerHTML = `
+    <section class="card">
+      ${btn('← Back', 'home')}
+      <h2>Add Money</h2>
+      <p>UPI ID:
+        <strong>${esc(settings.upiId || 'rjnpancenter@naviaxis')}</strong>
+      </p>
+      <p>Wallet funds are added only after manual admin verification.</p>
+
+      <form id="walletform">
+        <label>Amount (₹)
+          <input name="amount" type="number" min="1" required>
+        </label>
+        <label>UTR / Transaction ID
+          <input name="utr" required maxlength="100">
+        </label>
+        <label>Payment Screenshot
+          <input name="proof" type="file" accept="image/*" required>
+        </label>
+        <button type="submit">Submit for Approval</button>
+      </form>
+    </section>`;
+}
+
+async function requests() {
+  try {
+    let rows = await api('/api/customer/requests');
+    rows = Array.isArray(rows) ? rows : rows.requests || [];
+
+    app.innerHTML = `
+      <section class="card">
+        ${btn('← Back', 'home')}
+        <h2>My Requests</h2>
+        ${rows.map(r => `
+          <article class="card">
+            <h3>${esc(r.serviceName || r.service || 'Service Request')}</h3>
+            <p>Order: ${esc(r.id || '')}</p>
+            <p>Charge: ${cash(r.fee ?? r.price)}</p>
+            <p>Status: ${esc(r.status || 'Pending')}</p>
+          </article>
+        `).join('') || '<p>No requests yet.</p>'}
+      </section>`;
+  } catch (e) {
+    msg(e.message, true);
+  }
+}
+
+async function chat() {
+  try {
+    let rows = await api('/api/chat');
+    rows = Array.isArray(rows) ? rows : rows.messages || [];
+
+    app.innerHTML = `
+      <section class="card">
+        ${btn('← Back', 'home')}
+        <h2>Support Chat</h2>
+        ${rows.map(m => `
+          <p>
+            <b>${esc(m.from || m.senderName || 'Support')}:</b>
+            ${esc(m.text || m.message || '')}
+          </p>
+        `).join('')}
+
+        <form id="chatform">
+          <label>Message
+            <textarea name="message" required maxlength="2000"></textarea>
+          </label>
+          <button type="submit">Send</button>
+        </form>
+      </section>`;
+  } catch (e) {
+    msg(e.message, true);
+  }
+}
+
+async function admin(tab = 'dashboard') {
+  shell();
+
+  app.innerHTML = `
+    <section class="hero">
+      <h1>RJN PRINT PORTAL — Admin</h1>
+      <div class="nav">
+        ${btn('Overview', 'admin:dashboard')}
+        ${btn('Customers', 'admin:customers')}
+        ${btn('Wallet Requests', 'admin:wallet')}
+        ${btn('Service Requests', 'admin:requests')}
+        ${btn('Services', 'admin:services')}
+        ${btn('Support Chat', 'admin:chat')}
+      </div>
+    </section>
+    <section id="adm" class="card">Loading...</section>`;
+
+  const el = $('#adm');
+
+  try {
+    let h = '';
+
+    if (tab === 'dashboard') {
+      const d = await api('/api/admin/dashboard');
+      h = `<h2>Overview</h2><pre>${esc(JSON.stringify(d, null, 2))}</pre>`;
+    }
+
+    if (tab === 'customers') {
+      const a = await api('/api/admin/customers');
+      h = `<h2>Customers</h2>${a.map(u =>
+        `<p>${esc(u.name)} · ${esc(u.phone)} · ${esc(u.email)} · Wallet ${cash(u.wallet)}</p>`
+      ).join('')}`;
+    }
+
+    if (tab === 'wallet') {
+      const a = await api('/api/admin/wallet');
+      h = `<h2>Wallet Requests</h2>${a.map(w => `
+        <article class="card">
+          <p>${esc(w.customer || w.name || '')} · ${cash(w.amount)}</p>
+          <p>UTR: ${esc(w.utr)} · ${esc(w.status)}</p>
+          ${w.status === 'Pending'
+            ? `${btn('Approve', 'approve:' + w.id)}
+               ${btn('Reject', 'reject:' + w.id)}`
+            : ''}
+        </article>
+      `).join('')}`;
+    }
+
+    if (tab === 'requests') {
+      const a = await api('/api/admin/requests');
+      h = `<h2>Service Requests</h2>${a.map(r => `
+        <article class="card">
+          <b>${esc(r.serviceName || r.service || '')}</b>
+          <p>${esc(r.customer || '')} · ${cash(r.fee)} · ${esc(r.status)}</p>
+          <pre>${esc(JSON.stringify(r.data || {}, null, 2))}</pre>
+          ${btn('Mark Processing', 'process:' + r.id)}
+          ${btn('Reject', 'rejectreq:' + r.id)}
+        </article>
+      `).join('')}`;
+    }
+
+    if (tab === 'services') {
+      const a = await api('/api/admin/services');
+      h = `
+        <h2>Manage Services</h2>
+        <form id="addservice">
+          <label>Name
+            <input name="name" required>
+          </label>
+          <label>Price
+            <input name="price" type="number" min="0" required>
+          </label>
+          <label>Description
+            <input name="description">
+          </label>
+          <button type="submit">Add Service</button>
+        </form>
+        ${a.map(s => `<p>${esc(s.name)} · ${cash(s.price)}</p>`).join('')}`;
+    }
+
+    if (tab === 'chat') {
+      const a = await api('/api/admin/chat/users');
+      h = `<h2>Support Chats</h2>${a.map(u =>
+        `<p>${esc(u.name)} · ${esc(u.email)}</p>`
+      ).join('')}`;
+    }
+
+    el.innerHTML = h || '<p>No records found.</p>';
+  } catch (e) {
+    el.innerHTML = `<p class="notice">${esc(e.message)}</p>`;
+  }
+}
+
+document.addEventListener('click', async e => {
+  const b = e.target.closest('[data-a]');
+  if (!b) return;
+
+  const a = b.dataset.a;
+
+  try {
+    if (a === 'auth') return auth();
+    if (a === 'tablogin') return auth('login');
+    if (a === 'tabregister') return auth('register');
+    if (a === 'home') return home();
+    if (a === 'wallet') return wallet();
+    if (a === 'requests') return requests();
+    if (a === 'chat') return chat();
+    if (a === 'admin') return admin();
+
+    if (a === 'logout') {
+      await api('/api/logout', { method: 'POST', body: {} });
+      me = null;
+      shell();
+      return auth();
+    }
+
+    if (a.startsWith('service:')) {
+      const sid = a.slice(8);
+      services = await api('/api/services');
+      return serviceForm(services.find(s => String(s.id) === sid));
+    }
+
+    if (a.startsWith('admin:')) return admin(a.split(':')[1]);
+
+    if (a.startsWith('approve:') || a.startsWith('reject:')) {
+      const [decision, wid] = a.split(':');
+
+      if (!confirm('Confirm this wallet decision?')) return;
+
+      await api('/api/admin/wallet/' + wid + '/' +
+        (decision === 'approve' ? 'approve' : 'reject'),
+        { method: 'POST', body: {} });
+
+      return admin('wallet');
+    }
+
+    if (a.startsWith('process:') || a.startsWith('rejectreq:')) {
+      const reject = a.startsWith('rejectreq:');
+      const rid = a.slice(reject ? 10 : 8);
+
+      await api('/api/admin/request/' + rid + '/process', {
+        method: 'POST',
+        body: { status: reject ? 'Rejected' : 'Processing' }
+      });
+
+      return admin('requests');
+    }
+  } catch (err) {
+    msg(err.message, true);
+  }
+});
+
+document.addEventListener('submit', async e => {
+  const f = e.target;
+  if (!f.matches('form')) return;
+
+  e.preventDefault();
+
+  try {
+    if (f.id === 'login') {
+      const d = Object.fromEntries(new FormData(f));
+      const r = await api('/api/login', {
+        method: 'POST',
+        body: d
+      });
+
+      me = r.user || r;
+      settings = r.settings || {};
+      return home();
+    }
+
+    if (f.id === 'register') {
+      const r = await api('/api/register', {
+        method: 'POST',
+        body: Object.fromEntries(new FormData(f))
+      });
+
+      me = r.user || r;
+      settings = r.settings || {};
+      return home();
+    }
+
+    if (f.id === 'serviceform') {
+      const formData = new FormData(f);
+      const data = {};
+
+      for (const [key, value] of formData.entries()) {
+        if (key !== 'files' && typeof value === 'string') {
+          data[key] = value;
+        }
+      }
+
+      const uploadData = new FormData();
+      uploadData.append('data', JSON.stringify(data));
+
+      for (const file of f.querySelector('input[name="files"]')?.files || []) {
+        uploadData.append('files', file);
+      }
+
+      await api('/api/service/' + chosen.id + '/request', {
+        method: 'POST',
+        body: uploadData
+      });
+
+      chosen = null;
+      await home();
+      msg('Request submitted.');
+      return;
+    }
+
+    if (f.id === 'walletform') {
+      await api('/api/wallet/request', {
+        method: 'POST',
+        body: new FormData(f)
+      });
+
+      await wallet();
+      msg('Submitted for manual verification.');
+      return;
+    }
+
+    if (f.id === 'chatform') {
+      await api('/api/chat', {
+        method: 'POST',
+        body: Object.fromEntries(new FormData(f))
+      });
+
+      return chat();
+    }
+
+    if (f.id === 'addservice') {
+      await api('/api/admin/services', {
+        method: 'POST',
+        body: Object.fromEntries(new FormData(f))
+      });
+
+      return admin('services');
+    }
+  } catch (err) {
+    msg(err.message, true);
+  }
+});
+
+start();
