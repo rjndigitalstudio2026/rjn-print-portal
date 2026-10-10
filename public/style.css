@@ -1,0 +1,104 @@
+:root {
+  font-family: Arial, sans-serif;
+  color: #eef2ff;
+  background: #080d1d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #101b3c, #080d1d);
+}
+
+header {
+  padding: 20px;
+  background: #111a34;
+  border-bottom: 1px solid #293963;
+}
+
+.brand {
+  font-size: 22px;
+  font-weight: bold;
+  color: white;
+}
+
+.brand small {
+  display: block;
+  margin-top: 5px;
+  color: #9eb4ef;
+  font-size: 12px;
+}
+
+main {
+  max-width: 1000px;
+  margin: 25px auto;
+  padding: 16px;
+}
+
+.panel, .hero, .service, .stat {
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #293963;
+  border-radius: 16px;
+  background: #111a34;
+}
+
+.hero {
+  background: linear-gradient(120deg, #153d8b, #45229b);
+}
+
+h1 {
+  font-size: 32px;
+}
+
+p {
+  color: #bdc9e8;
+  line-height: 1.6;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+button {
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(100deg, #1678ff, #7638f4);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+input, select, textarea {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 13px;
+  border: 1px solid #34446d;
+  border-radius: 10px;
+  background: #080f25;
+  color: white;
+}
+
+.price {
+  color: #79e4c2;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  main {
+    margin-top: 12px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}
