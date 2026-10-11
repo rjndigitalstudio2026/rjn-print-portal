@@ -32,7 +32,8 @@ function load() {
       requests: [],
       messages: [],
       settings: {
-        upiId: process.env.UPI_ID || 'rjnpancenter@naviaxis'
+        upiId: process.env.UPI_ID || 'rjnpancenter@naviaxis',
+        logoData: ''
       }
     };
   }
@@ -64,8 +65,13 @@ const safeUser = u => ({
 function seed() {
   if (!db.settings) {
     db.settings = {
-      upiId: process.env.UPI_ID || 'rjnpancenter@naviaxis'
+      upiId: process.env.UPI_ID || 'rjnpancenter@naviaxis',
+      logoData: ''
     };
+  }
+
+  if (typeof db.settings.logoData !== 'string') {
+    db.settings.logoData = '';
   }
 
   if (!db.users.some(u => u.role === 'admin')) {
@@ -261,7 +267,10 @@ app.get('/api/me', (req, res) => {
   const u = db.users.find(x => x.id === req.session.userId);
   res.json({
     user: u ? safeUser(u) : null,
-    settings: { upiId: db.settings.upiId }
+    settings: {
+      upiId: db.settings.upiId,
+      logoData: db.settings.logoData || ''
+    }
   });
 });
 
@@ -831,9 +840,39 @@ app.get('/api/attachment/:mid', auth, (req, res) => {
 });
 
 app.post('/api/admin/settings', auth, admin, (req, res) => {
-  db.settings.upiId = String(req.body.upiId || db.settings.upiId);
+  if (!db.settings) db.settings = {};
+
+  if (typeof req.body.upiId === 'string') {
+    db.settings.upiId = req.body.upiId.trim();
+  }
+
+  if (typeof req.body.logoData === 'string') {
+    const logo = req.body.logoData;
+
+    if (logo.length > 2800000) {
+      return res.status(400).json({
+        error: 'Logo is too large. Please use a smaller image.'
+      });
+    }
+
+    if (
+      logo &&
+      !/^data:image\/(png|jpeg|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$/.test(logo)
+    ) {
+      return res.status(400).json({
+        error: 'Invalid logo format.'
+      });
+    }
+
+    db.settings.logoData = logo;
+  }
+
   save();
-  res.json(db.settings);
+
+  res.json({
+    upiId: db.settings.upiId,
+    logoData: db.settings.logoData || ''
+  });
 });
 
 setInterval(() => {
