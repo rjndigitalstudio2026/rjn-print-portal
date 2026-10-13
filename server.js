@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 require('dotenv').config();
 
 const app = express();
@@ -42,6 +43,9 @@ function load() {
 }
 
 let db = load();
+
+// Temporary, single-use password-reset tokens.
+const passwordResetChallenges = new Map();
 
 function save() {
   const tmp = DB + '.tmp';
@@ -274,13 +278,15 @@ app.get('/api/me', (req, res) => {
   });
 });
 
+// CUSTOMER REGISTRATION
+// Required fields: name, phone, email, password, PIN.
 app.post('/api/register', (req, res) => {
   try {
-    const { name, phone, email, password } = req.body;
+    const { name, phone, email, password, pin } = req.body;
 
-    if (!name || !phone || !email || !password) {
+    if (!name || !phone || !email || !password || !pin) {
       return res.status(400).json({
-        error: 'Name, mobile, email and password are required'
+        error: 'Name, mobile, email, password and PIN are required'
       });
     }
 
@@ -290,8 +296,21 @@ app.post('/api/register', (req, res) => {
       });
     }
 
+    if (!/^\d{4,8}$/.test(String(pin))) {
+      return res.status(400).json({
+        error: 'PIN must contain 4 to 8 digits'
+      });
+    }
+
+    const cleanName = String(name).trim();
     const e = String(email).trim().toLowerCase();
     const p = String(phone).trim();
+
+    if (cleanName.length < 2 || p.length < 7 || p.length > 20) {
+      return res.status(400).json({
+        error: 'Enter a valid name and mobile number'
+      });
+    }
 
     if (db.users.some(u => u.email === e || u.phone === p)) {
       return res.status(400).json({
@@ -301,10 +320,11 @@ app.post('/api/register', (req, res) => {
 
     const u = {
       id: id(),
-      name: String(name).trim(),
+      name: cleanName,
       phone: p,
       email: e,
-      passwordHash: bcrypt.hashSync(password, 12),
+      passwordHash: bcrypt.hashSync(String(password), 12),
+      pinHash: bcrypt.hashSync(String(pin), 12),
       role: 'customer',
       wallet: 0,
       createdAt: now()
@@ -319,6 +339,104 @@ app.post('/api/register', (req, res) => {
   }
 });
 
+// FORGOT PASSWORD — STEP 1
+// Verify registered name + mobile/email + recovery PIN.
+app.post('/api/forgot-password/verify', (req, res) => {
+  const name = String(req.body.name || '').trim().toLowerCase();
+  const identifier = String(req.body.identifier || '').trim();
+  const key = identifier.toLowerCase();
+  const pin = String(req.body.pin || '');
+
+  if (!name || !identifier || !pin) {
+    return res.status(400).json({
+      error: 'Name, mobile/email and PIN are required'
+    });
+  }
+
+  if (!/^\d{4,8}$/.test(pin)) {
+    return res.status(400).json({
+      error: 'Invalid recovery details'
+    });
+  }
+
+  const user = db.users.find(u =>
+    u.role === 'customer' &&
+    (
+      String(u.email || '').toLowerCase() === key ||
+      String(u.phone || '') === identifier
+    ) &&
+    String(u.name || '').trim().toLowerCase() === name
+  );
+
+  // Accounts created before PIN support do not have a recovery PIN.
+  if (!user || !user.pinHash || !bcrypt.compareSync(pin, user.pinHash)) {
+    return res.status(400).json({
+      error: 'Details do not match. Check your name, mobile/email and PIN.'
+    });
+  }
+
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  passwordResetChallenges.set(resetToken, {
+    userId: user.id,
+    expiresAt: Date.now() + 10 * 60 * 1000
+  });
+
+  res.json({
+    ok: true,
+    resetToken,
+    expiresIn: 600,
+    message: 'Details verified. You may now set a new password.'
+  });
+});
+
+// FORGOT PASSWORD — STEP 2
+// Set the new password using the verified, single-use token.
+app.post('/api/forgot-password/reset', (req, res) => {
+  const resetToken = String(req.body.resetToken || '');
+  const newPassword = String(req.body.newPassword || '');
+  const confirmPassword = String(req.body.confirmPassword || '');
+  const challenge = passwordResetChallenges.get(resetToken);
+
+  if (!challenge || challenge.expiresAt < Date.now()) {
+    passwordResetChallenges.delete(resetToken);
+    return res.status(400).json({
+      error: 'Verification expired. Please verify your details again.'
+    });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({
+      error: 'Password must be at least 8 characters'
+    });
+  }
+
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({
+      error: 'Passwords do not match'
+    });
+  }
+
+  const user = db.users.find(u =>
+    u.id === challenge.userId && u.role === 'customer'
+  );
+
+  passwordResetChallenges.delete(resetToken);
+
+  if (!user) {
+    return res.status(400).json({ error: 'Account not found' });
+  }
+
+  user.passwordHash = bcrypt.hashSync(newPassword, 12);
+  save();
+
+  res.json({
+    ok: true,
+    message: 'Password changed successfully. Please sign in.'
+  });
+});
+
+// CUSTOMER LOGIN — mobile number OR email + password.
 app.post('/api/login', (req, res) => {
   const identifier = String(req.body.identifier || '').trim();
   const key = identifier.toLowerCase();
@@ -542,7 +660,7 @@ app.post('/api/chat', auth, upload.single('attachment'), (req, res) => {
   res.json({ ok: true });
 });
 
-// Admin routes
+// ADMIN ROUTES
 app.get('/api/admin/dashboard', auth, admin, (req, res) => {
   const customers = db.users.filter(u => u.role === 'customer');
   const today = new Date().toISOString().slice(0, 10);
