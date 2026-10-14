@@ -186,7 +186,7 @@ function installStyles() {
 
     .app-tag {
       display: inline-block;
-      padding: 5px 9px;
+      padding: 5px 9px 
       border-radius: 20px;
       background: #eee7ff;
       color: #653bb5;
@@ -198,9 +198,9 @@ function installStyles() {
     .auth-page {
       min-height: 100vh;
       padding: 20px clamp(12px, 3vw, 45px);
-      background: linear-gradient(   -45deg,   #ff416c,   #7b2ff7,   #2575fc,   #00c9ff,   #ff416c ); background-size: 400% 400%; animation: authGradient 12s ease infinite;
+      background: linear-gradient(110deg, #a329bc 0%, #cf245a 24%, #f04b20 50%, #087eae 75%, #1654a0 100%); background-size: 400% 400%; animation: authGradient 12s ease infinite;
       background-size: 350% 350%;
-      animation: authGradient 14s ease infinite;
+      animation: smartpanBackground 14s ease infinite;
       overflow: hidden;
     }
 
@@ -306,7 +306,7 @@ function installStyles() {
       min-height: 112px;
       padding: 12px 6px;
       border-radius: 15px;
-      background: linear-gradient(145deg, #1638b6aa, #111c75aa);
+      background: linear-gradient(110deg, #a329bc 0%, #cf245a 24%, #f04b20 50%, #087eae 75%, #1654a0 100%);145deg, #1638b6aa, #111c75aa);
       border: 1px solid #8bdfff65;
       color: white;
       font-size: 12px;
