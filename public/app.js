@@ -198,7 +198,7 @@ function installStyles() {
     .auth-page {
       min-height: 100vh;
       padding: 20px clamp(12px, 3vw, 45px);
-      background: linear-gradient(-45deg, #062a8e, #4020c9, #b52fd0, #ff5574);
+      background: linear-gradient(   -45deg,   #ff416c,   #7b2ff7,   #2575fc,   #00c9ff,   #ff416c ); background-size: 400% 400%; animation: authGradient 12s ease infinite;
       background-size: 350% 350%;
       animation: authGradient 14s ease infinite;
       overflow: hidden;
@@ -788,7 +788,7 @@ function auth(mode = 'login') {
           </div>
         </label>
 
-        <button class="auth-submit" type="submit">CREATE ACCOUNT →</button>
+        <label>Secret PIN (4–6 digits)   <input     name="pin"     type="password"     inputmode="numeric"     pattern="[0-9]{4,6}"     minlength="4"     maxlength="6"     autocomplete="off"     required     title="Enter a PIN containing 4 to 6 digits"> </label>
       </form>
 
       <div class="auth-divider">Already registered?</div>
@@ -797,7 +797,7 @@ function auth(mode = 'login') {
     return;
   }
 
-  if (mode === 'forgot') {
+  if (mode === 'forgot') {     formArea.innerHTML = `       <h2>Forgot Password?</h2>       <p class="muted">         Enter your registered details and Secret PIN to verify your account.       </p>        <form id="forgot-verify" class="auth-form">         <label>Registered Full Name           <input name="name" autocomplete="name" required>         </label>          <label>Registered Mobile Number or Email           <input name="identifier" autocomplete="username" required>         </label>          <label>Secret PIN           <input name="pin" type="password"             inputmode="numeric" pattern="[0-9]{4,6}"             minlength="4" maxlength="6" required>         </label>          <button class="auth-submit" type="submit">           VERIFY DETAILS →         </button>       </form>        <button class="auth-secondary" type="button" data-a="tablogin">         BACK TO SIGN IN       </button>     `;     return;   }
     formArea.innerHTML = `
       <h2>Forgot Password?</h2>
       <p class="muted">
