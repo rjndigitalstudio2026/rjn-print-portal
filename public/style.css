@@ -18,3 +18,41 @@ table{width:100%;border-collapse:collapse;background:#fff;border-radius:12px;ove
 .alert,.notice{padding:13px 15px;border-radius:12px;background:#e5f6ff;border:1px solid #c9ebfb;color:#215c7d;margin:12px 0}.success{background:#e8fbf1;border-color:#c5f0d7;color:#147448}.error{background:#fff0f1;border-color:#ffd4da;color:#a6253b}hr{border:0;border-top:1px solid var(--line);margin:20px 0}img{max-width:100%}
 @media(max-width:640px){header{padding:12px 14px}#nav{gap:5px;padding:9px 12px}#nav button,#nav a{padding:9px 10px;font-size:13px}#app{padding:14px 12px 28px}section,.panel,form{border-radius:16px}.service-grid,.services-grid,.grid{grid-template-columns:1fr}table{display:block;overflow-x:auto;white-space:nowrap}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+/* RJN PRINT PORTAL - final visual fixes */
+.app-tag {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eee7ff;
+  color: #653bb5;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.auth-page {
+  background: linear-gradient(
+    110deg,
+    #a329bc,
+    #cf245a,
+    #f04b20,
+    #087eae,
+    #1654a0
+  );
+  background-size: 400% 400%;
+  animation: authGradient 12s ease infinite;
+}
+
+@keyframes authGradient {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@media (max-width: 700px) {
+  .auth-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
