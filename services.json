@@ -1,0 +1,298 @@
+[
+  {
+    "name": "Color Aadhaar Maker AI Instant 2.0",
+    "price": 5,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Browser tool; paid; admin configurable",
+    "icon": "/icons/services/01-color-aadhaar-maker-ai-instant-2-0.svg"
+  },
+  {
+    "name": "Epson L8050 PVC Card Maker & Print",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/02-epson-l8050-pvc-card-maker-print.svg"
+  },
+  {
+    "name": "Viral Document Mini Album Maker",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/03-viral-document-mini-album-maker.svg"
+  },
+  {
+    "name": "Voter Card AI Cropper",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/04-voter-card-ai-cropper.svg"
+  },
+  {
+    "name": "Aadhaar Card AI Cropper",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/05-aadhaar-card-ai-cropper.svg"
+  },
+  {
+    "name": "PAN Card AI Cropper",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/06-pan-card-ai-cropper.svg"
+  },
+  {
+    "name": "ABHA Card AI Cropper",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/07-abha-card-ai-cropper.svg"
+  },
+  {
+    "name": "Ayushman Card AI Cropper",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/08-ayushman-card-ai-cropper.svg"
+  },
+  {
+    "name": "Track Application Status",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Official/authorized integration required",
+    "icon": "/icons/services/09-track-application-status.svg"
+  },
+  {
+    "name": "NSDL PAN Documents Resizer",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/10-nsdl-pan-documents-resizer.svg"
+  },
+  {
+    "name": "Color Aadhaar Instant 1.0 OLD",
+    "price": 5,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Legacy colour Aadhaar layout tool; paid; admin configurable",
+    "icon": "/icons/services/11-color-aadhaar-instant-1-0-old.svg"
+  },
+  {
+    "name": "PDF Password Remover",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially; requires authorized password/access",
+    "icon": "/icons/services/12-pdf-password-remover.svg"
+  },
+  {
+    "name": "Word Typer Letter",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/13-word-typer-letter.svg"
+  },
+  {
+    "name": "Age Calculator",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/14-age-calculator.svg"
+  },
+  {
+    "name": "Biodata Maker",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/15-biodata-maker.svg"
+  },
+  {
+    "name": "QR Generator",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/16-qr-generator.svg"
+  },
+  {
+    "name": "AEPS & Thermal Bill Slip Maker",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/17-aeps-thermal-bill-slip-maker.svg"
+  },
+  {
+    "name": "Payment Standee",
+    "price": 0,
+    "category": "automatic",
+    "enabled": true,
+    "notes": "Free initially",
+    "icon": "/icons/services/18-payment-standee.svg"
+  },
+  {
+    "name": "New PAN Card Apply 18+",
+    "price": 250,
+    "category": "pan",
+    "enabled": true,
+    "notes": "Reference price; admin configurable",
+    "icon": "/icons/services/19-new-pan-card-apply-18.svg"
+  },
+  {
+    "name": "New PAN Card Apply Under 18 Age",
+    "price": 250,
+    "category": "pan",
+    "enabled": true,
+    "notes": "Guardian details required; reference price",
+    "icon": "/icons/services/20-new-pan-card-apply-under-18-age.svg"
+  },
+  {
+    "name": "Aadhaar to PAN Find",
+    "price": 75,
+    "category": "pan",
+    "enabled": true,
+    "notes": "Authorized lookup only; reference price",
+    "icon": "/icons/services/21-aadhaar-to-pan-find.svg"
+  },
+  {
+    "name": "PAN Number Se PAN Details",
+    "price": 50,
+    "category": "pan",
+    "enabled": true,
+    "notes": "Authorized lookup only; reference price",
+    "icon": "/icons/services/22-pan-number-se-pan-details.svg"
+  },
+  {
+    "name": "Track PAN Status",
+    "price": 0,
+    "category": "pan",
+    "enabled": true,
+    "notes": "Official tracking channel",
+    "icon": "/icons/services/23-track-pan-status.svg"
+  },
+  {
+    "name": "PAN Card Correction / Changes",
+    "price": 250,
+    "category": "pan",
+    "enabled": true,
+    "notes": "PAN number initially; provider may require more details",
+    "icon": "/icons/services/24-pan-card-correction-changes.svg"
+  },
+  {
+    "name": "PAN ID Retailer",
+    "price": 199,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, shop name/address, PIN, state, mobile, email, Aadhaar and PAN",
+    "icon": "/icons/services/25-pan-id-retailer.svg"
+  },
+  {
+    "name": "PAN ID Distributor",
+    "price": 349,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, shop name/address, PIN, state, mobile, email, Aadhaar and PAN",
+    "icon": "/icons/services/26-pan-id-distributor.svg"
+  },
+  {
+    "name": "PAN ID Super Distributor",
+    "price": 799,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, shop name/address, PIN, state, mobile, email, Aadhaar and PAN",
+    "icon": "/icons/services/27-pan-id-super-distributor.svg"
+  },
+  {
+    "name": "Mobile Recharge ID Retailer",
+    "price": 0,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, address, mobile, email; 3.50% commission subject to provider",
+    "icon": "/icons/services/28-mobile-recharge-id-retailer.svg"
+  },
+  {
+    "name": "Mobile Recharge ID Distributor",
+    "price": 49,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, address, mobile, email; 3.80% total rate subject to provider",
+    "icon": "/icons/services/29-mobile-recharge-id-distributor.svg"
+  },
+  {
+    "name": "Mobile Recharge ID Master Distributor",
+    "price": 99,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, address, mobile, email; 4.00% total rate subject to provider",
+    "icon": "/icons/services/30-mobile-recharge-id-master-distributor.svg"
+  },
+  {
+    "name": "Voter ID Mobile Number Link",
+    "price": 49,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, mobile, EPIC number",
+    "icon": "/icons/services/31-voter-id-mobile-number-link.svg"
+  },
+  {
+    "name": "Voter ID Original PDF",
+    "price": 49,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, EPIC number, mobile",
+    "icon": "/icons/services/32-voter-id-original-pdf.svg"
+  },
+  {
+    "name": "Aadhaar Number to PAN Number Find (Manual)",
+    "price": 49,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Aadhaar and mobile; authorized/consented process only",
+    "icon": "/icons/services/33-aadhaar-number-to-pan-number-find-manual.svg"
+  },
+  {
+    "name": "Voter ID Details Find",
+    "price": 29,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, mobile, EPIC number, state",
+    "icon": "/icons/services/34-voter-id-details-find.svg"
+  },
+  {
+    "name": "PAN Number to Aadhaar Number Find",
+    "price": 199,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name and PAN; authorized/consented process only",
+    "icon": "/icons/services/35-pan-number-to-aadhaar-number-find.svg"
+  },
+  {
+    "name": "Ration Number to Aadhaar Find",
+    "price": 199,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, ration number, state, DOB; authorized/consented process only",
+    "icon": "/icons/services/36-ration-number-to-aadhaar-find.svg"
+  },
+  {
+    "name": "Personal Details to Aadhaar Find",
+    "price": 199,
+    "category": "manual",
+    "enabled": true,
+    "notes": "Name, DOB, state, PIN, mobile; authorized/consented process only",
+    "icon": "/icons/services/37-personal-details-to-aadhaar-find.svg"
+  }
+]
