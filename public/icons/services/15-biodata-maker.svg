@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Biodata Maker">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ea580c" stop-opacity=".16"/></linearGradient></defs>
+<rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)" stroke="#ea580c" stroke-opacity=".35"/>
+<circle cx="49" cy="14" r="5" fill="#ea580c" opacity=".2"/>
+<g fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 15h26v34H19z"/><path d="M24 24h16 M24 31h16 M24 38h10"/></g>
+<text x="32" y="58" font-family="Arial,sans-serif" font-size="6" font-weight="700" text-anchor="middle" fill="#ea580c">RJN</text>
+</svg>

@@ -1,0 +1,65 @@
+*{box-sizing:border-box}body{margin:0;background:#f4f7fb;color:#15233b;font:15px/1.5 system-ui,Arial}header{background:linear-gradient(110deg,#102b58,#1665c8);color:white;padding:16px max(16px,calc((100% - 1180px)/2));display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}.brand{font-weight:900;font-size:22px}.brand span{display:block;font-size:12px;letter-spacing:3px}nav{display:flex;gap:7px;flex-wrap:wrap}button,.btn{border:0;border-radius:9px;background:#145bc0;color:#fff;padding:10px 14px;cursor:pointer;font-weight:650}nav button{background:#ffffff20}main{max-width:1180px;margin:26px auto;padding:0 16px;min-height:70vh}footer{text-align:center;padding:24px;color:#66748a}.hero,.panel,.service,.stat{background:#fff;border:1px solid #e1e8f2;border-radius:16px;padding:20px;box-shadow:0 8px 26px #1b37600b}.hero{background:linear-gradient(115deg,#eaf3ff,#fff);margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.service h3{margin:0 0 7px}.price{font-size:20px;font-weight:800;color:#155cc1}.muted{color:#66748a}.panel{margin:14px 0}.field{margin:12px 0}.field label{display:block;font-weight:650;margin-bottom:5px}input,textarea,select{width:100%;padding:11px;border:1px solid #ccd7e6;border-radius:9px;background:#fff;font:inherit}textarea{min-height:90px}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}.stat strong{display:block;font-size:25px}.alert{padding:12px;border-radius:10px;background:#fff4d7;margin:10px 0}.good{color:#078044}.bad{color:#d52d3b}.green{color:#078044}.red{color:#d52d3b}.yellow{color:#b17b00}table{border-collapse:collapse;width:100%;background:white}th,td{text-align:left;padding:10px;border-bottom:1px solid #e6ebf3;vertical-align:top}th{background:#f0f5fc}.scroll{overflow:auto}.hide{display:none}.small{font-size:12px}.pill{display:inline-block;border-radius:20px;background:#edf4ff;padding:3px 9px;font-size:12px}.section-title{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}img.poster{max-width:100%;max-height:260px;object-fit:contain}a{color:#155cc1} @media(max-width:600px){header{padding:14px}nav button{padding:8px}main{margin:14px auto}.panel,.hero{padding:15px}}
+/* Original RJN PRINT PORTAL service icons */
+.service-icon-wrap{height:76px;display:flex;align-items:center;justify-content:center;margin:2px auto 10px}
+.service-icon{width:68px;height:68px;object-fit:contain;display:block;filter:drop-shadow(0 5px 10px rgba(31,65,120,.08))}
+.service{overflow:hidden}
+@media(max-width:520px){.service-icon-wrap{height:64px}.service-icon{width:58px;height:58px}}
+
+/* Clearly-labelled demo activity preview */
+.demo-activity{border:1px solid #c9ddfa;background:linear-gradient(120deg,#fff,#f2f7ff)}
+.demo-pill{background:#fff0d6;color:#8b5200;font-weight:800}
+.live-dot{color:#078044;font-size:12px;font-weight:800;white-space:nowrap}
+.demo-activity-row{display:flex;align-items:center;gap:13px;padding:14px;margin-top:12px;background:#fff;border:1px solid #e0e9f6;border-radius:14px;min-height:78px}
+.demo-index{font-size:12px;color:#66748a;min-width:58px}
+.demo-avatar{width:42px;height:42px;display:grid;place-items:center;border-radius:50%;background:#e6f0ff;color:#155cc1;font-size:19px;font-weight:850}
+.demo-copy{display:flex;flex-direction:column;gap:3px;min-width:0;flex:1}
+.demo-copy span{font-size:13px;color:#66748a;overflow-wrap:anywhere}
+.demo-tag{font-size:10px;letter-spacing:1px;font-weight:850;color:#825500;background:#fff0d6;border-radius:7px;padding:5px 7px}
+
+/* RJN PRINT PORTAL supplied brand artwork */
+.brand{display:flex;align-items:center;min-width:140px}
+.brand-logo{display:block;width:178px;max-width:45vw;height:54px;object-fit:contain;object-position:left center}
+.dashboard-ad{display:block;width:100%;max-height:560px;object-fit:contain;object-position:center;margin:16px auto;border-radius:16px;background:#eef5ff}
+@media(max-width:600px){.brand-logo{width:148px;height:46px}.dashboard-ad{max-height:440px}}
+
+.auth-panel{max-width:520px;margin:32px auto;padding:26px}
+.auth-brand-mini{display:flex;justify-content:center;margin-bottom:16px}
+.auth-brand-mini img{width:190px;max-width:75%;height:80px;object-fit:contain}
+.auth-form{display:grid;gap:12px}
+.auth-form label{display:grid;gap:6px;font-weight:650}
+.auth-submit{width:100%;padding:13px;background:linear-gradient(110deg,#155cc1,#087de0);margin-top:4px}
+.auth-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.auth-link{background:transparent;color:#155cc1;padding:6px 0}
+.auth-secondary{background:#eaf2ff;color:#155cc1}
+
+/* Animated authentication screen inspired by the supplied reference */
+body.auth-view{background:#071426}
+.auth-scene{position:relative;min-height:calc(100vh - 110px);display:grid;grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);gap:clamp(24px,5vw,76px);align-items:center;justify-content:center;padding:clamp(20px,4vw,64px);overflow:hidden;border-radius:24px;background:linear-gradient(125deg,#091326,#102f70,#4b168d,#c51d65,#e14b35,#0c8b72,#0878d9,#091326);background-size:500% 500%;animation:authGradientFlow 22s ease-in-out infinite}
+.auth-scene:before{content:"";position:absolute;inset:-25%;background:conic-gradient(from 0deg,rgba(255,0,128,.16),rgba(0,180,255,.16),rgba(0,255,130,.12),rgba(255,180,0,.12),rgba(145,70,255,.18),rgba(255,0,128,.16));filter:blur(75px);animation:authAurora 30s linear infinite;pointer-events:none}
+@keyframes authGradientFlow{0%{background-position:0% 50%}25%{background-position:100% 20%}50%{background-position:100% 90%}75%{background-position:0% 80%}100%{background-position:0% 50%}}
+@keyframes authAurora{to{transform:rotate(360deg)}}
+.auth-poster-panel,.auth-panel{position:relative;z-index:1}
+.auth-poster-panel{display:flex;flex-direction:column;gap:12px;align-items:center}
+.auth-ad-poster{display:block;width:100%;max-width:740px;max-height:650px;object-fit:contain;border-radius:22px;box-shadow:0 25px 70px rgba(0,0,0,.3);background:rgba(255,255,255,.08)}
+.auth-poster-caption{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.4)}
+.auth-poster-caption span{font-weight:900;letter-spacing:2px;font-size:clamp(14px,2vw,20px)}
+.auth-poster-caption strong{font-size:clamp(17px,2.4vw,27px)}
+.auth-poster-caption small{font-size:13px;opacity:.9}
+.auth-panel{width:100%;max-width:480px;justify-self:center;margin:0;padding:clamp(24px,3vw,42px);border:1px solid rgba(255,255,255,.6);border-radius:24px;background:rgba(255,249,252,.96);box-shadow:0 25px 80px rgba(0,0,0,.22);color:#111827;backdrop-filter:blur(18px)}
+.auth-brand-mini img{width:190px;height:72px;object-fit:contain}
+.auth-panel h2{font-size:clamp(25px,3vw,32px);margin:10px 0}
+.auth-panel .muted{color:#697386}
+.auth-panel .auth-form label{color:#20263a;font-size:13px;gap:7px}
+.auth-panel .auth-form input{width:100%;box-sizing:border-box;border:1px solid #dbe3ef;border-radius:12px;background:#fff;padding:14px 15px;color:#121827;outline:none;transition:border-color .25s,box-shadow .25s}
+.auth-panel .auth-form input:focus{border-color:#7c3aed;box-shadow:0 0 0 4px rgba(124,58,237,.13)}
+.auth-panel .auth-submit{border:0;border-radius:12px;background:linear-gradient(100deg,#e52d79,#7c2bd9);color:#fff;font-weight:800;min-height:50px;box-shadow:0 10px 24px rgba(124,43,217,.2);cursor:pointer}
+.auth-panel .auth-submit:hover{filter:brightness(1.06)}
+.auth-actions{margin-top:14px}
+.auth-panel .auth-link{border:0;background:transparent;color:#7432c8;font-weight:700;cursor:pointer}
+.auth-panel .auth-link.compact{float:right;font-size:12px;padding:0}
+.auth-panel .password-label{display:block!important}
+.auth-panel .password-label input{margin-top:8px}
+.auth-new{display:grid;gap:12px;text-align:center;margin-top:22px;color:#8a91a2;font-size:13px}
+.auth-panel .auth-secondary{width:100%;border:1px solid #e4dfea;background:transparent;border-radius:12px;padding:13px;color:#25283a;font-weight:750;cursor:pointer}
+@media(max-width:850px){.auth-scene{grid-template-columns:1fr;gap:22px;padding:18px}.auth-poster-panel{order:2}.auth-panel{order:1;max-width:500px}.auth-ad-poster{max-height:420px}.auth-poster-caption{display:none}}
+@media(prefers-reduced-motion:reduce){.auth-scene,.auth-scene:before{animation:none}}

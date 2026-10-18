@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Aadhaar to PAN Find">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#7c3aed" stop-opacity=".16"/></linearGradient></defs>
+<rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)" stroke="#7c3aed" stroke-opacity=".35"/>
+<circle cx="49" cy="14" r="5" fill="#7c3aed" opacity=".2"/>
+<g fill="none" stroke="#7c3aed" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16h28v32H18z"/><path d="M24 23h16 M24 29h16 M24 35h10"/></g>
+<text x="32" y="58" font-family="Arial,sans-serif" font-size="6" font-weight="700" text-anchor="middle" fill="#7c3aed">RJN</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Track PAN Status">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#0d9488" stop-opacity=".16"/></linearGradient></defs>
+<rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)" stroke="#0d9488" stroke-opacity=".35"/>
+<circle cx="49" cy="14" r="5" fill="#0d9488" opacity=".2"/>
+<g fill="none" stroke="#0d9488" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20h30v24H17z"/><path d="M22 27h8 M22 34h19"/></g>
+<text x="32" y="58" font-family="Arial,sans-serif" font-size="6" font-weight="700" text-anchor="middle" fill="#0d9488">RJN</text>
+</svg>

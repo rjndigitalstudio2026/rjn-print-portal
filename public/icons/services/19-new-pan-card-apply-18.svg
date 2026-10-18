@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="New PAN Card Apply 18">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e75b45" stop-opacity=".16"/></linearGradient></defs>
+<rect x="2" y="2" width="60" height="60" rx="15" fill="url(#bg)" stroke="#e75b45" stroke-opacity=".35"/>
+<circle cx="49" cy="14" r="5" fill="#e75b45" opacity=".2"/>
+<g fill="none" stroke="#e75b45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M32 12 L46 22 L42 40 L32 48 L22 40 L18 22 Z"/><path d="M25 27h14 M25 33h14"/></g>
+<text x="32" y="58" font-family="Arial,sans-serif" font-size="6" font-weight="700" text-anchor="middle" fill="#e75b45">RJN</text>
+</svg>
