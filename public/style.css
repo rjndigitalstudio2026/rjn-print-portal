@@ -63,3 +63,156 @@ body.auth-view{background:#071426}
 .auth-panel .auth-secondary{width:100%;border:1px solid #e4dfea;background:transparent;border-radius:12px;padding:13px;color:#25283a;font-weight:750;cursor:pointer}
 @media(max-width:850px){.auth-scene{grid-template-columns:1fr;gap:22px;padding:18px}.auth-poster-panel{order:2}.auth-panel{order:1;max-width:500px}.auth-ad-poster{max-height:420px}.auth-poster-caption{display:none}}
 @media(prefers-reduced-motion:reduce){.auth-scene,.auth-scene:before{animation:none}}
+
+/* =====================================
+   RJN PRINT PORTAL - PREMIUM HOMEPAGE
+   Navy Blue + Orange + Cream Theme
+===================================== */
+
+:root {
+  --rjn-navy: #172541;
+  --rjn-orange: #f3932e;
+  --rjn-cream: #fff8eb;
+  --rjn-white: #ffffff;
+}
+
+body:not(.auth-view) {
+  background: var(--rjn-cream);
+  color: var(--rjn-navy);
+  font-family: Arial, sans-serif;
+}
+
+body:not(.auth-view) header {
+  background: var(--rjn-white);
+  color: var(--rjn-navy);
+  border-bottom: 1px solid #eee5d8;
+  box-shadow: 0 5px 24px rgba(23,37,65,.07);
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+body:not(.auth-view) nav button {
+  background: transparent;
+  color: var(--rjn-navy);
+  border-radius: 9px;
+}
+
+body:not(.auth-view) nav button:hover {
+  background: var(--rjn-cream);
+  color: #d87516;
+}
+
+body:not(.auth-view) nav .auth-buttons button:last-child {
+  background: var(--rjn-orange);
+  color: white;
+}
+
+body:not(.auth-view) main {
+  max-width: 1240px;
+  margin: 32px auto;
+}
+
+body:not(.auth-view) .hero {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(25px,5vw,65px);
+  border: 1px solid #f1dfc6;
+  border-radius: 25px;
+  background: linear-gradient(120deg,#fff8eb,#ffffff 65%,#ffedd8);
+  box-shadow: 0 15px 45px rgba(23,37,65,.07);
+}
+
+body:not(.auth-view) .hero h1 {
+  max-width: 750px;
+  font-size: clamp(32px,5vw,58px);
+  line-height: 1.12;
+  color: var(--rjn-navy);
+  margin: 0 0 15px;
+  font-weight: 900;
+}
+
+body:not(.auth-view) .hero p {
+  color: #58647a;
+  font-size: 16px;
+}
+
+body:not(.auth-view) .hero button,
+body:not(.auth-view) main button {
+  background: var(--rjn-navy);
+  color: white;
+  border-radius: 10px;
+  padding: 12px 19px;
+  transition: .2s ease;
+}
+
+body:not(.auth-view) .hero button:hover,
+body:not(.auth-view) main button:hover {
+  background: var(--rjn-orange);
+  transform: translateY(-2px);
+}
+
+body:not(.auth-view) .dashboard-ad {
+  max-height: 350px;
+  border-radius: 18px;
+  background: transparent;
+}
+
+body:not(.auth-view) .panel,
+body:not(.auth-view) .service {
+  background: white;
+  border: 1px solid #eee4d7;
+  border-radius: 18px;
+  box-shadow: 0 8px 28px rgba(23,37,65,.055);
+  padding: 23px;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+
+body:not(.auth-view) .panel:hover,
+body:not(.auth-view) .service:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(23,37,65,.10);
+}
+
+body:not(.auth-view) .panel h2,
+body:not(.auth-view) .panel h3,
+body:not(.auth-view) .service h3 {
+  color: var(--rjn-navy);
+}
+
+body:not(.auth-view) .price {
+  color: #df791d;
+}
+
+body:not(.auth-view) .pill {
+  background: #fff0d9;
+  color: #a65a13;
+}
+
+body:not(.auth-view) footer {
+  background: var(--rjn-navy);
+  color: white;
+  margin-top: 45px;
+  padding: 30px 16px;
+}
+
+@media(max-width:600px) {
+  body:not(.auth-view) main {
+    margin: 16px auto;
+  }
+
+  body:not(.auth-view) .hero {
+    padding: 22px;
+    border-radius: 17px;
+  }
+
+  body:not(.auth-view) .panel,
+  body:not(.auth-view) .service {
+    padding: 17px;
+  }
+
+  body:not(.auth-view) nav {
+    width: 100%;
+  }
+}
+
+
